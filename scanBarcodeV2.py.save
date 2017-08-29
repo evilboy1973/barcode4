@@ -1,0 +1,68 @@
+
+import sqlite3
+import sys
+import urllib
+import datetime
+from io import open
+import csv
+import os
+
+
+def log_values(staff_id):
+	conn=sqlite3.connect('/home/pi/Documents/python_project/barcode4/attendance.db')  #It is important to provide an
+							     				  #absolute path to the database
+							      				  #file, otherwise Cron won't be
+							     			 	  #able to find it!
+	curs=conn.cursor()
+	curs.execute("""INSERT INTO participants values(datetime(CURRENT_TIMESTAMP, 'localtime'),
+         (?))""", (temp))
+	conn.commit()
+	conn.close()
+
+
+def read_values():
+	import sqlite3
+	conn=sqlite3.connect('/home/pi/Documents/python_project/barcode4/attendance.db')
+	curs=conn.cursor()
+	curs.execute("SELECT * FROM participants")
+	temperatures = curs.fetchall()
+
+	conn.close()
+	return render_template("lab_env_db.html",temp=temperatures,hum=humidities)
+
+
+with open('attendance.txt','r',encoding='utf-8') as fin:
+	
+	count=0
+	csvreader=csv.reader(fin,delimiter=',')
+	header = next(csvreader)
+	list01=list(csvreader)
+
+
+	print(list01)	
+	print(len(list01))
+	
+	fin.close()
+
+while (sys.stdin.read(1).upper()!='Q'):
+		
+	line=sys.stdin.readline().rstrip()
+		
+	if line.upper()=='Q': break	
+	
+	if line!='':
+		d=str(datetime.datetime.now())
+		print('The Barcode is :'+line+','+d)
+		list01.append([line,d])
+
+	
+with open('attendance.txt','w',encoding='utf-8') as fout:
+		
+	csvwriter=csv.writer(fout,delimiter=',')
+	csvwriter.writerow(header)
+	
+	for rec in list01:
+		csvwriter.writerow(rec)
+	
+	fout.close()
+
